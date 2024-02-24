@@ -1,7 +1,7 @@
 # Wyoming Whisper API client
 
 [Wyoming protocol](https://github.com/rhasspy/wyoming) server
-for theWhisper API speech to text system.
+for the Whisper API speech to text system.
 
 My motivation was to establish a one working STT system for whole
 household, additionally to Home Assistant
@@ -43,4 +43,4 @@ Run a server anyone can connect to:
 
 # Support
 
-Matrix: #wyoming-whisper-api-client:sergevictor.eu
+Matrix: `#wyoming-whisper-api-client:sergevictor.eu`
