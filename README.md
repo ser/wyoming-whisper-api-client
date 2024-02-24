@@ -40,3 +40,7 @@ Run a server anyone can connect to:
 
 1. It's a rewrite of Michael Hansen's wyoming-faster-whisper.
 2. Tests are not functioning as there is no public Whisper API service to test it out.
+
+# Support
+
+Matrix: #wyoming-whisper-api-client:sergevictor.eu
