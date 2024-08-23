@@ -3,6 +3,7 @@ import argparse
 import httpx
 import logging
 import wave
+import re
 
 from io import BytesIO
 
@@ -66,6 +67,9 @@ class WhisperAPIEventHandler(AsyncEventHandler):
                         r = await client.post(self.cli_args.api, files=files, params=params, timeout=120.0)
                         #_LOGGER.debug(r.json())
                         text = r.json()['text']
+
+                text = re.sub(r'\[.*?\]', '', text).strip()
+                text = re.sub(r'\(.*?\)', '', text).strip()
 
             _LOGGER.info(text)
 
