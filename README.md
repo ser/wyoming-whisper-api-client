@@ -36,6 +36,37 @@ Run a server anyone can connect to:
 ./script/run --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference
 ```
 
+## Docker Installation
+
+Clone the repository and build the docker image:
+
+```sh
+git clone https://github.com/ser/wyoming-whisper-api-client
+cd wyoming-whisper-api-client
+docker build -t wyoming-whisper-api-client:latest .
+```
+
+Create the container:
+
+```sh
+docker container create -p 7891:7891 -i -t --name wyoming-whisper-api-client wyoming-whisper-api-client:latest --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference
+```
+
+Run The docker container:
+
+```sh
+# Detached in background
+docker start wyoming-whisper-api-client
+
+# Attached for debugging
+docker start wyoming-whisper-api-client --attach
+```
+
+Stop the container:
+```sh
+docker stop wyoming-whisper-api-client
+```
+
 # Acknowledgements
 
 1. It's a rewrite of Michael Hansen's wyoming-faster-whisper.
