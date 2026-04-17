@@ -20,7 +20,9 @@ whisper.cpp/server -m whisper.cpp/models/ggml-large-v3-q5_0.bin --host 0.0.0.0 -
 
 You need to study whisper.cpp to get more information about running its STT service.
 
-## Local Install
+## Installation
+
+### Local
 
 Clone the repository and set up Python virtual environment:
 
@@ -36,33 +38,33 @@ Run a server anyone can connect to:
 ./script/run --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference
 ```
 
-## Docker Installation
+### Docker
 
-Clone the repository and build the docker image:
+(**Optional**) The image is already published in GHCR. Build locally with:
 
 ```sh
 git clone https://github.com/ser/wyoming-whisper-api-client
 cd wyoming-whisper-api-client
-docker build -t wyoming-whisper-api-client:latest .
+docker build -t ghcr.io/ser/wyoming-whisper-api-client:latest .
 ```
 
-Create the container:
+Run the container:
 
 ```sh
-docker container create -p 7891:7891 -i -t --name wyoming-whisper-api-client wyoming-whisper-api-client:latest --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference
+docker run -p 7891:7891 -it --rm --name wyoming-whisper-api-client ghcr.io/ser/wyoming-whisper-api-client:latest \
+    --debug \
+    --uri tcp://0.0.0.0:7891 \
+    --api http://192.168.41.49:8910/inference
 ```
 
-Run The docker container:
+Attach for logging:
 
 ```sh
-# Detached in background
-docker start wyoming-whisper-api-client
-
-# Attached for debugging
-docker start wyoming-whisper-api-client --attach
+docker logs -f wyoming-whisper-api-client
 ```
 
 Stop the container:
+
 ```sh
 docker stop wyoming-whisper-api-client
 ```
