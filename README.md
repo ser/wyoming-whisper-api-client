@@ -8,7 +8,22 @@ household, additionally to Home Assistant
 I use it for [Blurt](https://github.com/QuantiusBenignus/blurt#network-transcription)
 gnome shell extension.
 
-You need a running Whisper compatible API service, for example Whisper.cpp instance:
+You need a running Whisper compatible API service.
+
+## Free Whisper compatible API servers
+
+### Nvidia Parakeet
+
+Do not let the name fool you, this model works very efficiently on a CPU and it's the
+model I am currently running for my needs.
+
+I am using a docker version from this repository, but it's up to you how do you like to make it running.
+
+https://github.com/chand1012/parakeet-server
+
+### Whisper.cpp
+
+Another example is Whisper.cpp instance which requires a GPU for speedy inference.
 
 https://github.com/ggerganov/whisper.cpp/tree/master/examples/server
 
