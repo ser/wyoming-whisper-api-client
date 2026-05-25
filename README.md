@@ -92,3 +92,7 @@ docker stop wyoming-whisper-api-client
 # Support
 
 Matrix: `#wyoming-whisper-api-client:sergevictor.eu`
+
+# Alternatives
+
+1. https://github.com/roryeckel/wyoming_openai - A proxy which handles STT and TTS in one.
