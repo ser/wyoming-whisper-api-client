@@ -91,7 +91,18 @@ docker stop wyoming-whisper-api-client
 
 # Support
 
-Matrix: `#wyoming-whisper-api-client:sergevictor.eu`
+Matrix: `#serdev:sergevictor.eu`
+
+# Contribution
+
+I do not accept any code or documentation contributions which have not been previously agreed upon. This means the order of steps is as follows:
+
+1. Open an issue or discussion topic first.
+2. Have a conversation about the matter at hand.
+3. Reach a consensus about both form and content of the contribution.
+4. Wait for a yay/nay signal from me.
+
+Please do not submit any pull requests before I ask for them, as they will be closed. This outlined, proven practice will save time for all involved.
 
 # Alternatives
 
