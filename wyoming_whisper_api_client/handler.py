@@ -30,6 +30,7 @@ class WhisperAPIEventHandler(AsyncEventHandler):
         self.cli_args = cli_args
         self.wyoming_info_event = wyoming_info.event()
         self.audio = bytes()
+        self.language = None
         self.audio_converter = AudioChunkConverter(
             rate=16000,
             width=2,
@@ -37,6 +38,10 @@ class WhisperAPIEventHandler(AsyncEventHandler):
         )
 
     async def handle_event(self, event: Event) -> bool:
+        if Transcribe.is_type(event.type):
+            request = Transcribe.from_event(event)
+            self.language = request.language
+
         if AudioChunk.is_type(event.type):
             if not self.audio:
                 _LOGGER.debug("Receiving audio")
@@ -55,9 +60,15 @@ class WhisperAPIEventHandler(AsyncEventHandler):
                         wavfile.setparams((1, 2, 16000, 0, 'NONE', 'NONE'))
                         wavfile.writeframes(self.audio)
 
+                        data = {}
+
+                        if self.language:
+                            data["language"] = self.language
+
                         files = {
                             "file": tmpfile.getvalue()
                         }
+
                         params = {
                             "temperature": "0.0",
                             "temperature_inc": "0.2",
@@ -67,7 +78,7 @@ class WhisperAPIEventHandler(AsyncEventHandler):
                         if self.cli_args.model:
                             params["model"] = self.cli_args.model
 
-                        r = await client.post(self.cli_args.api, files=files, params=params, timeout=120.0)
+                        r = await client.post(self.cli_args.api, files=files, data=data, params=params, timeout=120.0)
                         #_LOGGER.debug(r.json())
                         text = r.json()['text']
 
@@ -78,6 +89,7 @@ class WhisperAPIEventHandler(AsyncEventHandler):
 
             # Reset
             self.audio = bytes()
+            self.language = None
 
             return False
 
