@@ -53,6 +53,12 @@ Run a server anyone can connect to:
 ./script/run --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference
 ```
 
+To save the audio of every request as a timestamped `.wav` file, add `--log-dir`:
+
+```sh
+./script/run --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference --log-dir ./recordings
+```
+
 ### Docker
 
 (**Optional**) The image is already published in GHCR. Build locally with:
@@ -70,6 +76,20 @@ docker run -p 7891:7891 -it --rm --name wyoming-whisper-api-client ghcr.io/ser/w
     --debug \
     --uri tcp://0.0.0.0:7891 \
     --api http://192.168.41.49:8910/inference
+```
+
+To save the audio of every request as a `.wav` file, mount a host directory and
+point `--log-dir` at it (otherwise the files stay inside the container and are
+lost when it is removed):
+
+```sh
+docker run -p 7891:7891 -it --rm --name wyoming-whisper-api-client \
+    -v "$(pwd)/recordings:/recordings" \
+    ghcr.io/ser/wyoming-whisper-api-client:latest \
+    --debug \
+    --uri tcp://0.0.0.0:7891 \
+    --api http://192.168.41.49:8910/inference \
+    --log-dir /recordings
 ```
 
 Attach for logging:
