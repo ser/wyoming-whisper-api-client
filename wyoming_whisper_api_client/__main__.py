@@ -2,10 +2,8 @@
 import argparse
 import asyncio
 import logging
+import os
 from functools import partial
-from pathlib import Path
-from typing import Optional
-
 from wyoming.info import AsrModel, AsrProgram, Attribution, Info
 from wyoming.server import AsyncServer
 
@@ -21,18 +19,38 @@ async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--api",
-        required=True,
-        help="URL of whisper.cpp to use, http:// or https://",
+        default=os.getenv("WHISPER_API"),
+        required=os.getenv("WHISPER_API") is None,
+        help="URL of whisper.cpp to use, http:// or https:// "
+            "(env: WHISPER_API)",
     )
-    parser.add_argument("--uri", required=True, help="unix:// or tcp://")
+
+    parser.add_argument(
+        "--uri",
+        default=os.getenv("WYOMING_URI"),
+        required=os.getenv("WYOMING_URI") is None,
+        help="unix:// or tcp:// (env: WYOMING_URI)",
+    )
+
     parser.add_argument(
         "--model",
-        default=None,
-        help="Model name to use for transcription (sent as 'model' param to API)",
+        default=os.getenv("WHISPER_MODEL"),
+        help="Model name to use for transcription "
+            "(sent as 'model' param to API) "
+            "(env: WHISPER_MODEL)",
     )
-    parser.add_argument("--debug", action="store_true", help="Log DEBUG messages")
+
     parser.add_argument(
-        "--log-format", default=logging.BASIC_FORMAT, help="Format for log messages"
+        "--debug",
+        action="store_true",
+        default=os.getenv("DEBUG", "").lower() in ("1", "true", "yes", "on"),
+        help="Log DEBUG messages (env: DEBUG)",
+    )
+
+    parser.add_argument(
+        "--log-format",
+        default=os.getenv("LOG_FORMAT", logging.BASIC_FORMAT),
+        help="Format for log messages (env: LOG_FORMAT)",
     )
     parser.add_argument(
         "--version",

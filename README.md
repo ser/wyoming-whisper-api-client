@@ -53,6 +53,15 @@ Run a server anyone can connect to:
 ./script/run --uri tcp://0.0.0.0:7891 --debug --api http://192.168.41.49:8910/inference
 ```
 
+You can also provide the same startup values through environment variables:
+
+```sh
+WHISPER_API=http://192.168.41.49:8910/inference \
+WYOMING_URI=tcp://0.0.0.0:7891 \
+DEBUG=true \
+./script/run
+```
+
 ### Docker
 
 (**Optional**) The image is already published in GHCR. Build locally with:
@@ -70,6 +79,14 @@ docker run -p 7891:7891 -it --rm --name wyoming-whisper-api-client ghcr.io/ser/w
     --debug \
     --uri tcp://0.0.0.0:7891 \
     --api http://192.168.41.49:8910/inference
+```
+or
+```
+docker run -p 7891:7891 -it --rm --name wyoming-whisper-api-client \
+    -e DEBUG=true \
+    -e WYOMING_URI=tcp://0.0.0.0:7891 \
+    -e WHISPER_API=http://192.168.41.49:8910/inference \
+    ghcr.io/ser/wyoming-whisper-api-client:latest
 ```
 
 Attach for logging:
