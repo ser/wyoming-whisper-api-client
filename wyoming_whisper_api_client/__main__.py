@@ -19,16 +19,16 @@ async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--api",
-        default=os.getenv("WHISPER_API"),
-        required=os.getenv("WHISPER_API") is None,
+        default=os.getenv("WHISPER_API") or None,
+        required=not os.getenv("WHISPER_API"),
         help="URL of whisper.cpp to use, http:// or https:// "
             "(env: WHISPER_API)",
     )
 
     parser.add_argument(
         "--uri",
-        default=os.getenv("WYOMING_URI"),
-        required=os.getenv("WYOMING_URI") is None,
+        default=os.getenv("WYOMING_URI") or None,
+        required=not os.getenv("WYOMING_URI"),
         help="unix:// or tcp:// (env: WYOMING_URI)",
     )
 
