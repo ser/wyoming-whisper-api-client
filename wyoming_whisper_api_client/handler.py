@@ -1,7 +1,9 @@
 """Event handler for clients of the server."""
 import argparse
+import asyncio
 import httpx
 import logging
+import os
 import wave
 
 from datetime import datetime
@@ -42,10 +44,12 @@ class WhisperAPIEventHandler(AsyncEventHandler):
         """Save the audio of a request to a timestamped .wav file."""
         try:
             log_dir = Path(self.cli_args.log_dir)
-            log_dir.mkdir(parents=True, exist_ok=True)
+            log_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
             wav_path = log_dir / f"request_{timestamp}.wav"
-            wav_path.write_bytes(wav_bytes)
+            fd = os.open(wav_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, "wb") as f:
+                f.write(wav_bytes)
             _LOGGER.debug("Saved request audio to %s", wav_path)
         except OSError:
             _LOGGER.exception("Failed to save request audio to %s", self.cli_args.log_dir)
@@ -71,7 +75,7 @@ class WhisperAPIEventHandler(AsyncEventHandler):
                 wav_bytes = tmpfile.getvalue()
 
             if self.cli_args.log_dir:
-                self._save_request_wav(wav_bytes)
+                await asyncio.to_thread(self._save_request_wav, wav_bytes)
 
             async with httpx.AsyncClient() as client:
                 files = {
