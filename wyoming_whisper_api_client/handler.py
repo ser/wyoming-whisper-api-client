@@ -1,10 +1,14 @@
 """Event handler for clients of the server."""
 import argparse
+import asyncio
 import httpx
 import logging
+import os
 import wave
 
+from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 
 from wyoming.asr import Transcribe, Transcript
 from wyoming.audio import AudioChunk, AudioChunkConverter, AudioStop
@@ -36,6 +40,20 @@ class WhisperAPIEventHandler(AsyncEventHandler):
             channels=1,
         )
 
+    def _save_request_wav(self, wav_bytes: bytes) -> None:
+        """Save the audio of a request to a timestamped .wav file."""
+        try:
+            log_dir = Path(self.cli_args.log_dir)
+            log_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+            wav_path = log_dir / f"request_{timestamp}.wav"
+            fd = os.open(wav_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, "wb") as f:
+                f.write(wav_bytes)
+            _LOGGER.debug("Saved request audio to %s", wav_path)
+        except OSError:
+            _LOGGER.exception("Failed to save request audio to %s", self.cli_args.log_dir)
+
     async def handle_event(self, event: Event) -> bool:
         if AudioChunk.is_type(event.type):
             if not self.audio:
@@ -49,27 +67,32 @@ class WhisperAPIEventHandler(AsyncEventHandler):
 
         if AudioStop.is_type(event.type):
             _LOGGER.debug("Audio stopped")
+            with BytesIO() as tmpfile:
+                with wave.open(tmpfile, 'wb') as wavfile:
+                    wavfile.setparams((1, 2, 16000, 0, 'NONE', 'NONE'))
+                    wavfile.writeframes(self.audio)
+
+                wav_bytes = tmpfile.getvalue()
+
+            if self.cli_args.log_dir:
+                await asyncio.to_thread(self._save_request_wav, wav_bytes)
+
             async with httpx.AsyncClient() as client:
-                with BytesIO() as tmpfile:
-                    with wave.open(tmpfile, 'wb') as wavfile:
-                        wavfile.setparams((1, 2, 16000, 0, 'NONE', 'NONE'))
-                        wavfile.writeframes(self.audio)
+                files = {
+                    "file": wav_bytes
+                }
+                params = {
+                    "temperature": "0.0",
+                    "temperature_inc": "0.2",
+                    "response_format": "json"
+                }
 
-                        files = {
-                            "file": tmpfile.getvalue()
-                        }
-                        params = {
-                            "temperature": "0.0",
-                            "temperature_inc": "0.2",
-                            "response_format": "json"
-                        }
+                if self.cli_args.model:
+                    params["model"] = self.cli_args.model
 
-                        if self.cli_args.model:
-                            params["model"] = self.cli_args.model
-
-                        r = await client.post(self.cli_args.api, files=files, params=params, timeout=120.0)
-                        #_LOGGER.debug(r.json())
-                        text = r.json()['text']
+                r = await client.post(self.cli_args.api, files=files, params=params, timeout=120.0)
+                #_LOGGER.debug(r.json())
+                text = r.json()['text']
 
             _LOGGER.info(text)
 

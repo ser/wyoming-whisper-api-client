@@ -30,6 +30,11 @@ async def main() -> None:
         default=None,
         help="Model name to use for transcription (sent as 'model' param to API)",
     )
+    parser.add_argument(
+        "--log-dir",
+        default=None,
+        help="Directory to save the audio of every request as a timestamped .wav file",
+    )
     parser.add_argument("--debug", action="store_true", help="Log DEBUG messages")
     parser.add_argument(
         "--log-format", default=logging.BASIC_FORMAT, help="Format for log messages"
